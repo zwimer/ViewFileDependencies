@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import re
 from pathlib import Path
@@ -32,12 +34,12 @@ def create_uml( combine_cpp_hpp ):
         for k in depends[i]:
             if combine_cpp_hpp:
                 i = i.split('.')[0]; k = k.split('.')[0]
-            stng += i + ' --|> ' + k + '\n'
+            stng += '"' + i + '" --|> "' + k + '"\n'
         stng += '\n'
     return stng.strip()
 
 # Creates the uml diaggram of dependencies
-def view_file_dependencies( where_in, where_out_split, where_out_joined ):
+def view_file_dependencies( where, where_out_split, where_out_joined ):
 
     # Get files
     files = [ i for i in where.glob('*pp') if i.is_file() ]
@@ -59,11 +61,7 @@ def view_file_dependencies( where_in, where_out_split, where_out_joined ):
     print('\tpython -m plantuml ' + where_out_split)
     print('\tpython -m plantuml ' + where_out_joined)
 
-# Do not run on imports
-if __name__ == '__main__':
-
-    # Check args
-    assert len(sys.argv) == 4
+def main(inp, out1, out2):
 
     # Get directory
     where = Path(sys.argv[1])
@@ -71,4 +69,14 @@ if __name__ == '__main__':
     assert where.is_dir()
 
     # Create the uml
-    view_file_dependencies( sys.argv[1], sys.argv[2], sys.argv[3] )
+    view_file_dependencies( where, sys.argv[2], sys.argv[3] )
+
+# Do not run on imports
+if __name__ == '__main__':
+
+    # Check args
+    if len(sys.argv) != 4:
+        print 'Usage: ' + sys.argv[0] + ' <input dir> <outfile 1> <outfile 2>'
+        assert False
+
+    main(sys.argv[1], sys.argv[2], sys.argv[3])
